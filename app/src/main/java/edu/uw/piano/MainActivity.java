@@ -2,6 +2,9 @@ package edu.uw.piano;
 
 import android.app.Activity;
 import android.graphics.Rect;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
@@ -13,6 +16,9 @@ import java.util.HashMap;
 public class MainActivity extends Activity {
 
     private static final String TAG = "Piano";
+    private SoundPool soundPool;
+    private int[] soundIDs = new int[12];
+    private boolean[] soundBools = new boolean[]{false, false, false, false, false, false, false, false, false, false, false, false};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +31,69 @@ public class MainActivity extends Activity {
     //helper method for setting up the sound pool
     @SuppressWarnings("deprecation")
     private void initializeSoundPool(){
-        //TODO: Create the SoundPool
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+            //API >= 21
+            soundPool = new SoundPool.Builder()
+                    .setMaxStreams(4)
+                    .setAudioAttributes(new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_GAME)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build())
+                    .build();
+        }
+        else {
+            //API < 21
+            soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+        }
 
-        //TODO: Load the sounds
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                if (status == 0) {
+                    if (sampleId == soundIDs[0]) {
+                        soundBools[0] = true;
+                    } else if (sampleId == soundIDs[1]) {
+                        soundBools[1] = true;
+                    } else if (sampleId == soundIDs[2]) {
+                        soundBools[2] = true;
+                    } else if (sampleId == soundIDs[3]) {
+                        soundBools[3] = true;
+                    } else if (sampleId == soundIDs[4]) {
+                        soundBools[4] = true;
+                    } else if (sampleId == soundIDs[5]) {
+                        soundBools[5] = true;
+                    } else if (sampleId == soundIDs[6]) {
+                        soundBools[6] = true;
+                    } else if (sampleId == soundIDs[7]) {
+                        soundBools[7] = true;
+                    } else if (sampleId == soundIDs[8]) {
+                        soundBools[8] = true;
+                    } else if (sampleId == soundIDs[9]) {
+                        soundBools[9] = true;
+                    } else if (sampleId == soundIDs[10]) {
+                        soundBools[10] = true;
+                    } else if (sampleId == soundIDs[11]) {
+                        soundBools[11] = true;
+                    }
+                }
+            }
+        });
+
+        soundIDs[0] = soundPool.load(this, R.raw.piano_040, 1);
+        soundIDs[1] = soundPool.load(this, R.raw.piano_041, 1);
+        soundIDs[2] = soundPool.load(this, R.raw.piano_042, 1);
+        soundIDs[3] = soundPool.load(this, R.raw.piano_043, 1);
+        soundIDs[4] = soundPool.load(this, R.raw.piano_044, 1);
+        soundIDs[5] = soundPool.load(this, R.raw.piano_045, 1);
+        soundIDs[6] = soundPool.load(this, R.raw.piano_046, 1);
+        soundIDs[7] = soundPool.load(this, R.raw.piano_047, 1);
+        soundIDs[8] = soundPool.load(this, R.raw.piano_048, 1);
+        soundIDs[9] = soundPool.load(this, R.raw.piano_049, 1);
+        soundIDs[10] = soundPool.load(this, R.raw.piano_050, 1);
+        soundIDs[11] = soundPool.load(this, R.raw.piano_051, 1);
+
+
+
     }
 
 
@@ -54,7 +120,9 @@ public class MainActivity extends Activity {
         Log.v(TAG, "Tapped key: "+KEY_NAMES[key]);
 
         //TODO: Play sound depending on key pressed!
-
+        if (soundBools[key]) {
+            soundPool.play(soundIDs[key], .5f, .5f, 0, 0, 1);
+        }
     }
 
 
